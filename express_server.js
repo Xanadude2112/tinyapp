@@ -24,6 +24,14 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+// Handle GET requests to "/urls.json"
+app.get("/urls.json", (req, res) => {
+  // When a client/browser requests "/urls.json", the server responds by sending the `urlDatabase` object as JSON data.
+  // The server uses the `res` object's `json()` method to send the JSON response back to the client.
+  // This method automatically sets the appropriate Content-Type header to indicate that the response is in JSON format.
+  res.json(urlDatabase); //converts the urlDatabase object into a JSON string
+})
+
 // Start the Express server and make it listen for incoming connections on the specified port
 app.listen(PORT, () => {
   // Log a message to the console indicating that the server is listening on the specified port
