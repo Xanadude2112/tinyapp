@@ -42,6 +42,14 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+app.get("/urls", (req, res) => {
+  const templateVars = { urls: urlDatabase }; 
+  res.render("urls_index", templateVars)
+})
+
+app.get("/urls/:id", (req, res) => {
+  const templateVars = {id: req.params.id, longURL: urlDatabase}
+})
 // Start the Express server and make it listen for incoming connections on the specified port
 app.listen(PORT, () => {
   // Log a message to the console indicating that the server is listening on the specified port
