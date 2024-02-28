@@ -7,6 +7,8 @@ const app = express();
 // Define the port number the server will listen on
 const PORT = 8080; // Default port 8080
 
+app.set("view engine", "ejs");// tells the Express app to use EJS as its templating engine
+
 // Define a database object that maps short URLs to their corresponding long URLs
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
