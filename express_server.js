@@ -43,7 +43,11 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  // Create an object `templateVars` containing the `urlDatabase` data
+  // This object will be used to pass data to the template (view) for rendering
   const templateVars = { urls: urlDatabase }; 
+  // Render the "urls_index" template using the provided template variables
+  // The `urls_index` template will use the data in `templateVars` to dynamically generate HTML
   res.render("urls_index", templateVars)
 })
 
