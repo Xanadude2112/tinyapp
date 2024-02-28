@@ -32,7 +32,11 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase); //converts the urlDatabase object into a JSON string
 })
 
+// Handle GET requests to "/hello"
 app.get("/hello", (req, res) => {
+  // When a client/browser requests "/hello", the server responds by sending an HTML page containing the text "Hello <b>World</b>"
+  // The server uses the `res` object's `send()` method to send the HTML response back to the client.
+  // This method sets the Content-Type header to indicate that the response is HTML.
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
