@@ -19,7 +19,7 @@
   <body>
     <%- include('partials/_header') %>
 
-    <main style="margin: 1em;">
+    <main style="margin: 1em">
       <h3>My URLs</h3>
       <table class="table">
         <thead>
@@ -30,16 +30,24 @@
         </thead>
         <tbody>
           <% for (let id in urls) { %>
-            <tr>
-              <td><%= id %></td>
-              <td><%= urls[id] %></td>
-              <td>
-                <!-- Form for deleting the URL -->
-                <form method="POST" action="/urls/<%= id %>/delete">
-                  <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-              </td>
-            </tr>
+          <tr>
+            <td><%= id %></td>
+            <td><%= urls[id] %></td>
+            <td>
+              <!-- Form for deleting the URL -->
+              <!-- 
+                This form sends a POST request to delete a URL with a specific ID.
+                When the button inside the form is clicked, it triggers the form submission.
+                 -->
+              <form method="POST" action="/urls/<%= id %>/delete">
+                <!-- 
+                  This button, when clicked, submits the form to delete the URL.
+                  It has a red color scheme to indicate the delete action.
+                   -->
+                <button type="submit" class="btn btn-outline-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
           <% } %>
         </tbody>
       </table>
