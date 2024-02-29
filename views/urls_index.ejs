@@ -7,6 +7,7 @@
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
 
+    <link rel="shortcut icon" href=views/images/tinyApp.png" type="image/png">
     <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
@@ -33,6 +34,7 @@
           <tr>
             <td><%= id %></td>
             <td><%= urls[id] %></td>
+            <td><a href="/urls/<%= id %>"><button type="button" class="btn btn-outline-primary">Edit</button></a></td>
             <td>
               <!-- Form for deleting the URL -->
               <!-- 

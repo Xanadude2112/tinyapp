@@ -95,7 +95,14 @@ app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   delete urlDatabase[id];
   res.redirect('/urls');
-})
+});
+
+app.post("/urls/:id", (req, res) => {
+  urlDatabase[id] = req.body.longURL
+  console.log(req.body);
+  console.log(id) 
+  res.redirect('/urls');
+});
 
 // Start the Express server and make it listen for incoming connections on the specified port
 app.listen(PORT, () => {
