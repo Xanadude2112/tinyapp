@@ -91,6 +91,12 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  const id = req.params.id;
+  delete urlDatabase[id];
+  res.redirect('/urls');
+})
+
 // Start the Express server and make it listen for incoming connections on the specified port
 app.listen(PORT, () => {
   // Log a message to the console indicating that the server is listening on the specified port
