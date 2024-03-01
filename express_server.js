@@ -106,9 +106,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  urlDatabase[id] = req.body.longURL
-  console.log(req.body);
-  console.log(id) 
+  urlDatabase[id] = req.body.longURL;
   res.redirect('/urls');
 });
 
@@ -124,6 +122,11 @@ app.post("/login", (req, res) => {
     // Handle invalid username (optional)
     res.status(400).send('Invalid username');
   }
+})
+
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect('/urls');
 })
 
 
