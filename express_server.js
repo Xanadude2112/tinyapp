@@ -29,16 +29,13 @@ const generateRandomString = function () {
 //Middleware to parse cookies
 app.use(cookieParser());
 
-
 // Define a database object that maps short URLs to their corresponding long URLs
 
 app.use(express.urlencoded({ extended: true }));
 // Define a route handler for GET requests to the root URL ("/")
-// "req" is like a messenger from the client's browser to the server, containing details about the client's request.
-// It holds information like parameters, headers, cookies, and more.
+// req holds details about the client's request, including parameters, headers, cookies, etc.
 
-// "res" is like a messenger from the server back to the client's browser, containing methods and data to send a response.
-// It provides ways to send data back to the client, such as HTML, JSON, files, or just a simple string like "Hello!".
+// res sends responses back to the client's browser, containing data such as HTML, JSON, files, or strings.
 app.get("/", (req, res) => {
   // Send the response "Hello!" to the client
   res.send("Hello!");
