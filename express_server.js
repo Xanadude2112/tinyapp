@@ -105,6 +105,16 @@ app.post("/urls/:id", (req, res) => {
   res.redirect('/urls');
 });
 
+app.post("/login", (req, res) => {
+  const { username } = req.body;
+  if(username){
+    res.cookie('username', username);
+    res.redirect('/urls');
+  } else {
+    res.status(400).send('Invalid username');
+  }
+})
+
 // Start the Express server and make it listen for incoming connections on the specified port
 app.listen(PORT, () => {
   // Log a message to the console indicating that the server is listening on the specified port
