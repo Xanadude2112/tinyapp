@@ -1,5 +1,6 @@
 // Import the express library/module
 const express = require("express");
+const cookieParser = require('cookie-parser');
 
 // Create a new instance of an Express application
 const app = express();
@@ -9,7 +10,6 @@ const PORT = 8080; // Default port 8080
 
 app.set("view engine", "ejs"); // tells the Express app to use EJS as its templating engine
 
-// Define a database object that maps short URLs to their corresponding long URLs
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
@@ -25,6 +25,12 @@ const generateRandomString = function () {
   }
   return result;
 };
+
+//Middleware to parse cookies
+app.use(cookieParser());
+
+
+// Define a database object that maps short URLs to their corresponding long URLs
 
 app.use(express.urlencoded({ extended: true }));
 // Define a route handler for GET requests to the root URL ("/")
@@ -57,7 +63,8 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   // Create an object `templateVars` containing the `urlDatabase` data
   // This object will be used to pass data to the template (view) for rendering
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: urlDatabase,
+  username: req.cookies["username"] };
   // Render the "urls_index" template using the provided template variables
   // The `urls_index` template will use the data in `templateVars` to dynamically generate HTML
   res.render("urls_index", templateVars);
@@ -71,14 +78,17 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+const templateVars = {
+  username: req.cookies["username"]
+}
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id; // Getting the short URL id from the URL parameter
   const longURL = urlDatabase[id]; // Looking up the corresponding long URL
   if (longURL) {
-    const templateVars = { id, longURL }; // Preparing variables for the template
+    const templateVars = { id, longURL , username: req.cookies["username"]}; // Preparing variables for the template
     res.render("urls_show", templateVars); // Rendering the template with our variables
   } else {
     res.status(404).send("Short URL does not exist");
@@ -118,6 +128,7 @@ app.post("/login", (req, res) => {
     res.status(400).send('Invalid username');
   }
 })
+
 
 // Start the Express server and make it listen for incoming connections on the specified port
 app.listen(PORT, () => {
