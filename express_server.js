@@ -105,12 +105,16 @@ app.post("/urls/:id", (req, res) => {
   res.redirect('/urls');
 });
 
+// POST route handler for /login
 app.post("/login", (req, res) => {
-  const { username } = req.body;
+  const { username } = req.body;// Extract username from request body
   if(username){
+    // Set cookie named username with the submitted value
     res.cookie('username', username);
+    // Redirect back to the /urls page
     res.redirect('/urls');
   } else {
+    // Handle invalid username (optional)
     res.status(400).send('Invalid username');
   }
 })
