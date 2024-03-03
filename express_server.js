@@ -122,12 +122,16 @@ app.post("/login", (req, res) => {
     // Handle invalid username (optional)
     res.status(400).send('Invalid username');
   }
-})
+});
 
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect('/urls');
-})
+});
+
+app.get("/register", (req, res) => {
+  res.render("register");
+});
 
 
 // Start the Express server and make it listen for incoming connections on the specified port

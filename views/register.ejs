@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
@@ -13,26 +10,16 @@
       integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
       crossorigin="anonymous"
     />
-    <title>URL - TinyApp Example</title>
+    <title>Document</title>
   </head>
-
   <body>
-    <%- include('partials/_header') %>
-
-    <div class="card text-center">
-      <div class="card-header"></div>
-      <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-        <p class="card-text">
-          Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
-        </p>
-        <form method="POST" action="/urls/<%= id %>">
-          <input type="text" name="longURL" value="<%= longURL %>" required>
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+    <form class="form-inline ml-auto" method="POST" action="/register">
+      <div class="form-group mb-2">
+        <input class="form-control" type="email" name="Email" placeholder="email@example.com" style="width: 300px; margin: 1em"/>
+        <input class="form-control" type="password" name="password" placeholder="Enter Password" style="width: 300px; margin: 1em"/>
+        <button type="submit" class="btn btn-primary">Submit</button>
       </div>
-      <div class="card-footer text-muted"></div>
-    </div>
+    </form>
 
     <!-- Bootstrap JS -->
     <script
