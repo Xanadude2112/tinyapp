@@ -112,6 +112,11 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
+app.get("/login", (req,res) => {
+  const user = users[req.cookies["user_id"]];
+  const templateVars = { user: user };
+  res.render("login", templateVars);
+})
 // Define a route handler for POST requests to "/login"
 app.post("/login", (req, res) => {
   const email = req.body.email;
@@ -135,7 +140,9 @@ app.post("/logout", (req, res) => {
 
 // Define a route handler for GET requests to "/register"
 app.get("/register", (req, res) => {
-  res.render("register");
+  const user = users[req.cookies["user_id"]];
+  const templateVars = { user: user };
+  res.render("register", templateVars);
 });
 
 // Define a route handler for POST requests to "/register"
