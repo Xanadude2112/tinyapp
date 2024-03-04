@@ -28,7 +28,7 @@ const users = {
   },
 };
 
-const generateRandomString = function () {
+const generateRandomString = function() {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
@@ -69,17 +69,30 @@ app.get("/urls", (req, res) => {
 
 // Define a route handler for POST requests to "/urls"
 app.post("/urls", (req, res) => {
-  const longURL = req.body.longURL;
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls/${shortURL}`);
+  const user = users[req.cookies["user_id"]];
+  // Check if the user is not logged in before doing any other logic.
+  if (!user) {
+    // Immediately send a response and return to stop further execution.
+    return res.status(401).send("<html><body><h1>Unauthorized</h1><p>You need to be logged in to shorten URLs.</p></body></html>");
+  } else {
+  // If the execution reaches here, it means the user is logged in.
+    const longURL = req.body.longURL;
+    const shortURL = generateRandomString();
+    urlDatabase[shortURL] = longURL; // Move adding to the database here, inside the logged-in check.
+
+    res.redirect(`/urls/${shortURL}`);
+  }
 });
 
 // Define a route handler for GET requests to "/urls/new"
 app.get("/urls/new", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = { user: user };
-  res.render("urls_new", templateVars);
+  if (!user) {
+    res.redirect("/login");
+  } else {
+    res.render("urls_new", templateVars);
+  }
 });
 
 // Define a route handler for GET requests to "/urls/:id"
@@ -95,6 +108,9 @@ app.get("/urls/:id", (req, res) => {
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
+  if (!longURL) {
+    return res.status(404).send("<html><body><h1>Unregistered</h1><p>This ID is not a registered Short ID.</p></body></html>");
+  }
   res.redirect(longURL);
 });
 
@@ -115,7 +131,11 @@ app.post("/urls/:id", (req, res) => {
 app.get("/login", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = { user: user, error: null }; // Initialize error as null
-  res.render("login", templateVars);
+  if (user) {
+    res.redirect("/urls");
+  } else {
+    res.render("login", templateVars);
+  }
 });
 // Define a route handler for POST requests to "/login"
 app.post("/login", (req, res) => {
@@ -141,8 +161,12 @@ app.post("/logout", (req, res) => {
 // Define a route handler for GET requests to "/register"
 app.get("/register", (req, res) => {
   const user = users[req.cookies["user_id"]];
-  const templateVars = { user: user };
-  res.render("register", templateVars);
+  const templateVars = { user: user, error: null }; // Initialize error as null
+  if (user) {
+    res.redirect("/urls");
+  } else {
+    res.render("register", templateVars);
+  }
 });
 
 // Define a route handler for POST requests to "/register"
@@ -156,7 +180,9 @@ app.post("/register", (req, res) => {
   }
 
   // Check if the email already exists in users object
-  const existingUser = Object.values(users).find((user) => user.email === email);
+  const existingUser = Object.values(users).find(
+    (user) => user.email === email
+  );
   if (existingUser) {
     return res.status(400).send("Email already exists");
   }
