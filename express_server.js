@@ -112,11 +112,11 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
-app.get("/login", (req,res) => {
+app.get("/login", (req, res) => {
   const user = users[req.cookies["user_id"]];
-  const templateVars = { user: user };
+  const templateVars = { user: user, error: null }; // Initialize error as null
   res.render("login", templateVars);
-})
+});
 // Define a route handler for POST requests to "/login"
 app.post("/login", (req, res) => {
   const email = req.body.email;
@@ -128,14 +128,15 @@ app.post("/login", (req, res) => {
     res.cookie("user_id", user.id);
     res.redirect("/urls");
   } else {
-    res.status(400).send("Invalid email or password");
+    res.status(403);
+    res.render("login", {error: "Invalid email or password"});
   }
 });
 
 // Define a route handler for POST requests to "/logout"
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 // Define a route handler for GET requests to "/register"

@@ -16,19 +16,22 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+      </div>
+      <div class="navbar-nav ml-auto">
         <% if (!user) { %>
           <a class="nav-item nav-link" href="/register">Register</a>
           <a class="nav-item nav-link" href="/login">Login</a>
-          <% } %>
-      </div>
-      <div class="navbar-nav ml-auto">
+        <% } %>
         <% if (typeof user !== 'undefined' && user) { %>
-          <span class="nav-item px-3 mt-1">Logged in as <span style="font-weight: 600; color: white;">
+        <span class="nav-item px-3 mt-1"
+          >Logged in as
+          <span style="font-weight: 600; color: white">
             <%= user.email %>
-          </span></span>
-          <form action="/logout" method="POST">
-            <button type="submit" class="btn btn-outline-dark">Log Out</button>
-          </form>
+          </span></span
+        >
+        <form action="/logout" method="POST">
+          <button type="submit" class="btn btn-outline-dark">Log Out</button>
+        </form>
         <% } %>
       </div>
     </div>
