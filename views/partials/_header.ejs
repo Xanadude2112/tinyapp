@@ -16,11 +16,12 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        <a class="nav-item nav-link" href="/register">Register</a>
       </div>
       <div class="navbar-nav ml-auto">
-        <% if (typeof username !== 'undefined' && username) { %>
+        <% if (typeof user !== 'undefined' && user) { %>
           <span class="nav-item px-3 mt-1">Logged in as <span style="font-weight: 600; color: white;">
-            <%= username %>
+            <%= user.email %>
           </span></span>
           <form action="/logout" method="POST">
             <button type="submit" class="btn btn-outline-dark">Log Out</button>

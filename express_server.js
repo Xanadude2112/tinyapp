@@ -15,6 +15,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 const generateRandomString = function () {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -60,8 +73,9 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   // Create an object `templateVars` containing the `urlDatabase` data
   // This object will be used to pass data to the template (view) for rendering
+  const user = users[req.cookies["user_id"]];
   const templateVars = { urls: urlDatabase,
-  username: req.cookies["username"] };
+  user: user};
   // Render the "urls_index" template using the provided template variables
   // The `urls_index` template will use the data in `templateVars` to dynamically generate HTML
   res.render("urls_index", templateVars);
@@ -75,8 +89,9 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
+  const user = users[req.cookies["user_id"]];
 const templateVars = {
-  username: req.cookies["username"]
+  user: user
 }
   res.render("urls_new", templateVars);
 });
@@ -85,7 +100,8 @@ app.get("/urls/:id", (req, res) => {
   const id = req.params.id; // Getting the short URL id from the URL parameter
   const longURL = urlDatabase[id]; // Looking up the corresponding long URL
   if (longURL) {
-    const templateVars = { id, longURL , username: req.cookies["username"]}; // Preparing variables for the template
+    const user = users[req.cookies["user_id"]];
+    const templateVars = { id, longURL , user: user}; // Preparing variables for the template
     res.render("urls_show", templateVars); // Rendering the template with our variables
   } else {
     res.status(404).send("Short URL does not exist");
@@ -112,10 +128,11 @@ app.post("/urls/:id", (req, res) => {
 
 // POST route handler for /login
 app.post("/login", (req, res) => {
-  const { username } = req.body;// Extract username from request body
-  if(username){
+  const user = users[req.cookies["user_id"]];
+  user = req.body;// Extract username from request body
+  if(user){
     // Set cookie named username with the submitted value
-    res.cookie('username', username);
+    res.cookie('user', user);
     // Redirect back to the /urls page
     res.redirect('/urls');
   } else {
@@ -125,7 +142,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user');
   res.redirect('/urls');
 });
 
@@ -133,9 +150,29 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
+// Handle POST requests to register a new user
+app.post("/register", (req, res) => {
+  // Generate a random user ID
+  const userID = generateRandomString();
+  // Create a new user object with the provided email and password
+  users[userID] = {
+    id: userID,
+    email: req.body.email,
+    password: req.body.password
+  };
+  // Set a user_id cookie containing the user's newly generated ID
+  res.cookie("user_id", userID);
+  // Redirect the user to the /urls page after registration
+  res.redirect("/urls");
+});
 
 // Start the Express server and make it listen for incoming connections on the specified port
 app.listen(PORT, () => {
   // Log a message to the console indicating that the server is listening on the specified port
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+// 1. POST route set user_id cookie
+// 2. verify cookie works
+// 3. refactor all routes to handle and take in the user object instead of username
+// 4. modify your header partial to accept the user not username
