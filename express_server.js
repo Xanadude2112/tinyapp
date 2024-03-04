@@ -128,8 +128,7 @@ app.post("/login", (req, res) => {
     res.cookie("user_id", user.id);
     res.redirect("/urls");
   } else {
-    res.status(403);
-    res.render("login", {error: "Invalid email or password"});
+    res.status(403).send("Invalid email or password");
   }
 });
 
