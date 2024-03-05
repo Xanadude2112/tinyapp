@@ -11,8 +11,14 @@ const PORT = 8080; // Default port 8080
 app.set("view engine", "ejs"); // tells the Express app to use EJS as its templating engine
 
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "Dgv5tk",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 const users = {
@@ -39,6 +45,16 @@ const generateRandomString = function() {
   return result;
 };
 
+function urlsForUser(id) {
+  let filteredURLs = {};
+  for(let key in urlDatabase) {
+    if(urlDatabase[key].userID === id) {
+      filteredURLs[key] = urlDatabase[key];
+    }
+  }
+  return filteredURLs;
+}
+
 // Middleware to parse cookies
 app.use(cookieParser());
 
@@ -62,8 +78,17 @@ app.get("/hello", (req, res) => {
 
 // Define a route handler for GET requests to "/urls"
 app.get("/urls", (req, res) => {
-  const user = users[req.cookies["user_id"]];
-  const templateVars = { urls: urlDatabase, user: user };
+  const userID = req.cookies["user_id"];
+  const user = users[userID];
+  if(!user) {
+    return res.status(401).send("<html><body><h1>Unauthorized</h1><p>You need to register or be logged in to view URLs.</p><a href='http://localhost:8080/login' style='text-decoration: none; font-weight: 600;'>LOG IN</a></body></html>");
+  }
+  //call urlsForUser with ID and obtain the filtered URLS
+  const userURLs = urlsForUser(userID);
+
+  //update templateVars with filtered URLs
+  const templateVars = { urls: userURLs, user: user };
+  //render the page with filtered URLs for the logged-in user
   res.render("urls_index", templateVars);
 });
 
@@ -73,12 +98,12 @@ app.post("/urls", (req, res) => {
   // Check if the user is not logged in before doing any other logic.
   if (!user) {
     // Immediately send a response and return to stop further execution.
-    return res.status(401).send("<html><body><h1>Unauthorized</h1><p>You need to be logged in to shorten URLs.</p></body></html>");
+    return res.status(401).send("<html><body><h1>Unauthorized</h1><p>You need to be logged in to shorten URLs.</p><a href='http://localhost:8080/login' style='text-decoration: none; font-weight: 600;'>LOG IN</a></body></html>");
   } else {
   // If the execution reaches here, it means the user is logged in.
     const longURL = req.body.longURL;
     const shortURL = generateRandomString();
-    urlDatabase[shortURL] = longURL; // Move adding to the database here, inside the logged-in check.
+    urlDatabase[shortURL] = { longURL: longURL, userID: user.id }; // Move adding to the database here, inside the logged-in check.
 
     res.redirect(`/urls/${shortURL}`);
   }
@@ -98,8 +123,17 @@ app.get("/urls/new", (req, res) => {
 // Define a route handler for GET requests to "/urls/:id"
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id];
-  const user = users[req.cookies["user_id"]];
+  const longURL = urlDatabase[id].longURL;
+  const userID = req.cookies["user_id"];
+  const user = users[userID];
+//if you are not logged in you will be denied access to My URLs
+  if(!user) {
+    return res.status(401).send("<html><body><h1>Unauthorized</h1><p>You need to be logged in to shorten URLs.</p><a href='http://localhost:8080/login' style='text-decoration: none; font-weight: 600;'>LOG IN</a></body></html>");
+  }
+//you cannot use the Short URL from someone elses account
+  if(userID !== urlDatabase[id].userID){
+    return res.status(401).send("<html><body><h1>Forbidden</h1><p>You cannot use the Short URL of another user. Please create / use your own.</p><a href='http://localhost:8080/urls/new' style='text-decoration: none; font-weight: 600;'>USE YOUR OWN</a></body></html>")
+  }
   const templateVars = { id, longURL, user: user };
   res.render("urls_show", templateVars);
 });
@@ -107,7 +141,7 @@ app.get("/urls/:id", (req, res) => {
 // Define a route handler for GET requests to "/u/:id"
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id];
+  const longURL = urlDatabase[id].longURL;
   if (!longURL) {
     return res.status(404).send("<html><body><h1>Unregistered</h1><p>This ID is not a registered Short ID.</p></body></html>");
   }
@@ -116,7 +150,23 @@ app.get("/u/:id", (req, res) => {
 
 // Define a route handler for POST requests to "/urls/:id/delete"
 app.post("/urls/:id/delete", (req, res) => {
+  const userID = req.cookies["user_id"];
   const id = req.params.id;
+
+  //Check if the ID exists in the database
+  if(!urlDatabase[id]){
+    return res.status(404).send("<html><body><h1>URL not found.</h1><a href='http://localhost:8080/urls' style='text-decoration: none; font-weight: 600;'>GO BACK</a></body></html>")
+  }
+
+  //Check if the user is logged in
+  if (!userID) {
+    return res.status(401).send("<html><body><h1>Unauthorized</h1><p>You need to be logged in to delete URLs.</p><a href='http://localhost:8080/login' style='text-decoration: none; font-weight: 600;'>LOGIN</a></body></html>")
+  }
+
+  if(urlDatabase[id].userID !== userID) {
+    return res.status(403).send("<html><body><h1>Forbidden</h1><p>You don't have permission to delete this URL.</p><a href='http://localhost:8080/urls' style='text-decoration: none; font-weight: 600;'>GO BACK</a></body></html>")
+  }
+  //if all checks pass, delete the URL from the database
   delete urlDatabase[id];
   res.redirect("/urls");
 });
@@ -124,7 +174,7 @@ app.post("/urls/:id/delete", (req, res) => {
 // Define a route handler for POST requests to "/urls/:id"
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  urlDatabase[id] = req.body.longURL;
+  urlDatabase[id].longURL = req.body.longURL; // Update only the longURL property
   res.redirect("/urls");
 });
 

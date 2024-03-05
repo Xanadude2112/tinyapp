@@ -33,19 +33,11 @@
           <% for (let id in urls) { %>
           <tr>
             <td><%= id %></td>
-            <td><%= urls[id] %></td>
+            <!-- Access the longURL property of the URL object -->
+            <td><%= urls[id].longURL %></td>
             <td><a href="/urls/<%= id %>"><button type="button" class="btn btn-outline-primary">Edit</button></a></td>
             <td>
-              <!-- Form for deleting the URL -->
-              <!-- 
-                This form sends a POST request to delete a URL with a specific ID.
-                When the button inside the form is clicked, it triggers the form submission.
-                 -->
               <form method="POST" action="/urls/<%= id %>/delete">
-                <!-- 
-                  This button, when clicked, submits the form to delete the URL.
-                  It has a red color scheme to indicate the delete action.
-                   -->
                 <button type="submit" class="btn btn-outline-danger">Delete</button>
               </form>
             </td>
