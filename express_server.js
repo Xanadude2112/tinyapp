@@ -1,10 +1,20 @@
 // Import the express library/module
 const express = require("express");
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 
 // Create a new instance of an Express application
 const app = express();
+
+// Middleware to parse cookies
+//.use use middleware
+app.use(cookieSession({ //
+  name: 'session', //name could be anything but make sure context is there
+  keys: ['key1', 'key2'],
+}));
+
+// Middleware to parse URL-encoded bodies (as sent by HTML forms)
+app.use(express.urlencoded({ extended: true }));
 
 // Define the port number the server will listen on
 const PORT = 8080; // Default port 8080
@@ -56,12 +66,6 @@ function urlsForUser(id) {
   return filteredURLs;
 }
 
-// Middleware to parse cookies
-app.use(cookieParser());
-
-// Middleware to parse URL-encoded bodies (as sent by HTML forms)
-app.use(express.urlencoded({ extended: true }));
-
 // Define a route handler for GET requests to the root URL ("/")
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -79,7 +83,7 @@ app.get("/hello", (req, res) => {
 
 // Define a route handler for GET requests to "/urls"
 app.get("/urls", (req, res) => {
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const user = users[userID];
   if (!user) {
     return res
@@ -99,7 +103,7 @@ app.get("/urls", (req, res) => {
 
 // Define a route handler for POST requests to "/urls"
 app.post("/urls", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   // Check if the user is not logged in before doing any other logic.
   if (!user) {
     // Immediately send a response and return to stop further execution.
@@ -120,7 +124,7 @@ app.post("/urls", (req, res) => {
 
 // Define a route handler for GET requests to "/urls/new"
 app.get("/urls/new", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = { user: user };
   if (!user) {
     res.redirect("/login");
@@ -133,7 +137,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id].longURL;
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const user = users[userID];
   //if you are not logged in you will be denied access to My URLs
   if (!user) {
@@ -171,7 +175,7 @@ app.get("/u/:id", (req, res) => {
 
 // Define a route handler for POST requests to "/urls/:id/delete"
 app.post("/urls/:id/delete", (req, res) => {
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const id = req.params.id;
 
   //Check if the ID exists in the database
@@ -212,7 +216,7 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = { user: user, error: null }; // Initialize error as null
   if (user) {
     res.redirect("/urls");
@@ -229,7 +233,7 @@ app.post("/login", (req, res) => {
 
   // Compare hashed passwords
   if (user && bcrypt.compareSync(password, user.password)) {
-    res.cookie("user_id", user.id);
+    req.session.user_id = user.id;
     res.redirect("/urls");
   } else {
     res.status(403).send("Invalid email or password");
@@ -238,13 +242,13 @@ app.post("/login", (req, res) => {
 
 // Define a route handler for POST requests to "/logout"
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null; // clears the session
   res.redirect("/login");
 });
 
 // Define a route handler for GET requests to "/register"
 app.get("/register", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = { user: user, error: null }; // Initialize error as null
   if (user) {
     res.redirect("/urls");
@@ -279,7 +283,7 @@ app.post("/register", (req, res) => {
     password: hashedPassword, // Store hashed password
   };
   console.log(users[userID]);
-  res.cookie("user_id", userID);
+  req.session.user_id = userID;
   res.redirect("/urls");
 });
 
