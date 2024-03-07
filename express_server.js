@@ -2,16 +2,25 @@
 const express = require("express");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
+const {
+  generateRandomString,
+  urlsForUser,
+  getUserByEmail,
+} = require("./helpers");
+const { urlDatabase, users } = require("./data");
 
 // Create a new instance of an Express application
 const app = express();
 
 // Middleware to parse cookies
 //.use use middleware
-app.use(cookieSession({ //
-  name: 'session', //name could be anything but make sure context is there
-  keys: ['key1', 'key2'],
-}));
+app.use(
+  cookieSession({
+    //
+    name: "session", //name could be anything but make sure context is there
+    keys: ["key1", "key2"],
+  })
+);
 
 // Middleware to parse URL-encoded bodies (as sent by HTML forms)
 app.use(express.urlencoded({ extended: true }));
@@ -20,51 +29,6 @@ app.use(express.urlencoded({ extended: true }));
 const PORT = 8080; // Default port 8080
 
 app.set("view engine", "ejs"); // tells the Express app to use EJS as its templating engine
-
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "Dgv5tk",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "aJ48lW",
-  },
-};
-
-const users = {
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
-  },
-};
-
-const generateRandomString = function () {
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  const charactersLength = characters.length;
-  for (let i = 0; i < 6; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-};
-
-function urlsForUser(id) {
-  let filteredURLs = {};
-  for (let key in urlDatabase) {
-    if (urlDatabase[key].userID === id) {
-      filteredURLs[key] = urlDatabase[key];
-    }
-  }
-  return filteredURLs;
-}
 
 // Define a route handler for GET requests to the root URL ("/")
 app.get("/", (req, res) => {
@@ -136,9 +100,16 @@ app.get("/urls/new", (req, res) => {
 // Define a route handler for GET requests to "/urls/:id"
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id].longURL;
   const userID = req.session.user_id;
   const user = users[userID];
+  const urlObject = urlDatabase[id]; // lines 4 & 8 in data.js
+  if (!urlObject) {
+    return res
+      .status(404)
+      .send(
+        "<html><body><h1>Unregistered</h1><p>This ID is not a registered Short ID.</p></body></html>"
+      );
+  }
   //if you are not logged in you will be denied access to My URLs
   if (!user) {
     return res
@@ -155,6 +126,7 @@ app.get("/urls/:id", (req, res) => {
         "<html><body><h1>Forbidden</h1><p>You cannot use the Short URL of another user. Please create / use your own.</p><a href='http://localhost:8080/urls/new' style='text-decoration: none; font-weight: 600;'>USE YOUR OWN</a></body></html>"
       );
   }
+  const longURL = urlDatabase[id].longURL;
   const templateVars = { id, longURL, user: user };
   res.render("urls_show", templateVars);
 });
@@ -162,14 +134,15 @@ app.get("/urls/:id", (req, res) => {
 // Define a route handler for GET requests to "/u/:id"
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id].longURL;
-  if (!longURL) {
+  const urlObject = urlDatabase[id]; // lines 4 & 8 in data.js
+  if (!urlObject) {
     return res
       .status(404)
       .send(
         "<html><body><h1>Unregistered</h1><p>This ID is not a registered Short ID.</p></body></html>"
       );
   }
+  const longURL = urlDatabase[id].longURL;
   res.redirect(longURL);
 });
 
@@ -229,7 +202,7 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  const user = Object.values(users).find((user) => user.email === email);
+  const user = getUserByEmail(email, users);
 
   // Compare hashed passwords
   if (user && bcrypt.compareSync(password, user.password)) {
@@ -261,7 +234,7 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const hashedPassword = bcrypt.hashSync(password, 10);// Hash the password
+  const hashedPassword = bcrypt.hashSync(password, 10); // Hash the password
   // Check if email or password is empty
   if (!email || !password) {
     return res.status(400).send("Email and password cannot be empty");
