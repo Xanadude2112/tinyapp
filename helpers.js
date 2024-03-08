@@ -30,8 +30,8 @@ const getUserByEmail = function (email, database) {
       return users[userID];
     }
   }
-  // If no match is found, return null
-  return null;
+  // If no match is found, return undefined
+  return undefined;
 };
 
 module.exports = { generateRandomString, urlsForUser, getUserByEmail };

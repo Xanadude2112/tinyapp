@@ -23,7 +23,9 @@ app.use(
 );
 
 // Middleware to parse URL-encoded bodies (as sent by HTML forms)
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
+
+app.use(express.json());
 
 // Define the port number the server will listen on
 const PORT = 8080; // Default port 8080
@@ -32,7 +34,7 @@ app.set("view engine", "ejs"); // tells the Express app to use EJS as its templa
 
 // Define a route handler for GET requests to the root URL ("/")
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/login");
 });
 
 // Define a route handler for GET requests to "/urls.json"
@@ -103,6 +105,7 @@ app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const user = users[userID];
   const urlObject = urlDatabase[id]; // lines 4 & 8 in data.js
+  //if your are using an id that is not registered
   if (!urlObject) {
     return res
       .status(404)
@@ -113,12 +116,12 @@ app.get("/urls/:id", (req, res) => {
   //if you are not logged in you will be denied access to My URLs
   if (!user) {
     return res
-      .status(401)
+      .status(403)
       .send(
         "<html><body><h1>Unauthorized</h1><p>You need to be logged in to shorten URLs.</p><a href='http://localhost:8080/login' style='text-decoration: none; font-weight: 600;'>LOG IN</a></body></html>"
       );
   }
-  //you cannot use the Short URL from someone elses account
+  //if you try to edit the short URL that you do not own
   if (userID !== urlDatabase[id].userID) {
     return res
       .status(401)
@@ -190,7 +193,7 @@ app.post("/urls/:id", (req, res) => {
 
 app.get("/login", (req, res) => {
   const user = users[req.session.user_id];
-  const templateVars = { user: user, error: null }; // Initialize error as null
+  const templateVars = { user: user, error: undefined }; // Initialize error as undefined
   if (user) {
     res.redirect("/urls");
   } else {
@@ -222,7 +225,7 @@ app.post("/logout", (req, res) => {
 // Define a route handler for GET requests to "/register"
 app.get("/register", (req, res) => {
   const user = users[req.session.user_id];
-  const templateVars = { user: user, error: null }; // Initialize error as null
+  const templateVars = { user: user, error: undefined }; // Initialize error as undefined
   if (user) {
     res.redirect("/urls");
   } else {

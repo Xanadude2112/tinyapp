@@ -1,6 +1,6 @@
 const { assert } = require("chai");
 const { getUserByEmail } = require("../helpers");
-const { users } = ("../data");
+const { users } = require("../data");
 
 describe('getUserByEmail', function() {
 

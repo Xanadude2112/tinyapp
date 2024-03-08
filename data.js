@@ -1,9 +1,8 @@
 // store data from express_server.js for easier access to helper.js file
-
 const urlDatabase = {
   b6UTxQ: { // id
     longURL: "https://www.tsn.ca",
-    userID: "Dgv5tk",
+    userID: "user2RandomID",
   },
   i3BoGr: { // id
     longURL: "https://www.google.ca",
