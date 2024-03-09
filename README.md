@@ -6,8 +6,9 @@ You can share your URLs with others, a well as have your own personalized accoun
 
 ## Final Product
 
-!["screenshot description"](#)
-!["screenshot description"](#)
+!["Screenshot of URLs page"](https://github.com/Xanadude2112/tinyapp/blob/main/docs/urls-page.png?raw=true)
+!["Screenshot of new URLs creation page"](https://github.com/Xanadude2112/tinyapp/blob/main/docs/create-new-url-page.png.png?raw=true)
+!["Screenshot of login page"](https://github.com/Xanadude2112/tinyapp/blob/main/docs/login-page.png?raw=true)
 
 ## Dependencies
 
