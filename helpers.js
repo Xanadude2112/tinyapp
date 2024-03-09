@@ -1,6 +1,6 @@
 const { urlDatabase, users } = require("./data");
 
-const generateRandomString = function () {
+const generateRandomString = function() {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
@@ -11,7 +11,7 @@ const generateRandomString = function () {
   return result;
 };
 
-function urlsForUser(id) {
+const urlsForUser = function(id) {
   let filteredURLs = {};
   for (let key in urlDatabase) {
     if (urlDatabase[key].userID === id) {
@@ -21,7 +21,7 @@ function urlsForUser(id) {
   return filteredURLs;
 }
 
-const getUserByEmail = function (email, database) {
+const getUserByEmail = function(email, database) {
   // Loop through each user in the database
   for (let userID in users) {
     // Check if the email matches the current user's email

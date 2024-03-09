@@ -55,7 +55,7 @@ app.get("/urls", (req, res) => {
     return res
       .status(401)
       .send(
-        "<html><body><h1>Unauthorized</h1><p>You need to register or be logged in to view URLs.</p><a href='http://localhost:8080/login' style='text-decoration: none; font-weight: 600;'>LOG IN</a></body></html>"
+        "<html><body><h1>Unauthorized</h1><p>You need to be logged in to view URLs.</p><a href='http://localhost:8080/login' style='text-decoration: none; font-weight: 600;'>LOG IN</a></body></html>"
       );
   }
   //call urlsForUser with ID and obtain the filtered URLS
@@ -212,7 +212,7 @@ app.post("/login", (req, res) => {
     req.session.user_id = user.id;
     res.redirect("/urls");
   } else {
-    res.status(403).send("Invalid email or password");
+    res.status(403).send("Invalid email or password <a href='http://localhost:8080/login' style='text-decoration: none; font-weight: 600;'>TRY AGAIN</a>");
   }
 });
 
@@ -258,7 +258,6 @@ app.post("/register", (req, res) => {
     email: email,
     password: hashedPassword, // Store hashed password
   };
-  console.log(users[userID]);
   req.session.user_id = userID;
   res.redirect("/urls");
 });
