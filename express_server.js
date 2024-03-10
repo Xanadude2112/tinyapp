@@ -37,16 +37,6 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
-// Define a route handler for GET requests to "/urls.json"
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase); // Send the `urlDatabase` object as JSON
-});
-
-// Define a route handler for GET requests to "/hello"
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
 // Define a route handler for GET requests to "/urls"
 app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
